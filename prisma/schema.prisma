@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Project {
+  id             String               @id @default(cuid())
+  slug           String               @unique
+  coverImageSrc  String
+  coverImageAlt  String
+  backgroundImage String
+  backgroundAlt  String
+  publishedAt    DateTime?
+  createdAt      DateTime             @default(now())
+  updatedAt      DateTime             @updatedAt
+  translations   ProjectTranslation[]
+  buttons        ProjectButton[]
+  sections       ProjectSection[]
+}
+
+model ProjectTranslation {
+  id        String   @id @default(cuid())
+  locale    String
+  title     String
+  status    String
+  type      String
+  tags      String
+  message   String
+  subtitle  String
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@unique([projectId, locale])
+}
+
+model ProjectButton {
+  id           String                     @id @default(cuid())
+  icon         Boolean                    @default(false)
+  url          String
+  order        Int
+  projectId    String
+  project      Project                    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  translations ProjectButtonTranslation[]
+}
+
+model ProjectButtonTranslation {
+  id       String        @id @default(cuid())
+  locale   String
+  text     String
+  buttonId String
+  button   ProjectButton @relation(fields: [buttonId], references: [id], onDelete: Cascade)
+
+  @@unique([buttonId, locale])
+}
+
+model ProjectSection {
+  id           String                      @id @default(cuid())
+  order        Int
+  flexDirection String
+  coverImage   String
+  projectId    String
+  project      Project                     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  translations ProjectSectionTranslation[]
+}
+
+model ProjectSectionTranslation {
+  id         String         @id @default(cuid())
+  locale     String
+  summary    String
+  readMore   String
+  modalContent String
+  close      String
+  sectionId  String
+  section    ProjectSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@unique([sectionId, locale])
+}
+
+model Article {
+  id                        String               @id @default(cuid())
+  slug                      String               @unique
+  coverImageSrc             String
+  bannerImage               String
+  researchStyleBorderTop    String
+  researchStyleBorderBottom String
+  publishedAt               DateTime?
+  createdAt                 DateTime             @default(now())
+  updatedAt                 DateTime             @updatedAt
+  translations              ArticleTranslation[]
+  sections                  ArticleSection[]
+}
+
+model ArticleTranslation {
+  id           String  @id @default(cuid())
+  locale       String
+  category     String
+  title        String
+  content      String
+  contentTitle String
+  articleId    String
+  article      Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@unique([articleId, locale])
+}
+
+model ArticleSection {
+  id           String                      @id @default(cuid())
+  order        Int
+  image        String?
+  articleId    String
+  article      Article                     @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  translations ArticleSectionTranslation[]
+}
+
+model ArticleSectionTranslation {
+  id        String         @id @default(cuid())
+  locale    String
+  title     String
+  paragraph String
+  sectionId String
+  section   ArticleSection @relation(fields: [sectionId], references: [id], onDelete: Cascade)
+
+  @@unique([sectionId, locale])
+}
