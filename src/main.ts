@@ -4,20 +4,34 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
+function parseAllowedCorsOrigins() {
+  const configuredOrigins =
+    process.env.CORS_ALLOWED_ORIGINS ??
+    'http://localhost:5173,http://127.0.0.1:5173,http://localhost:4173,http://127.0.0.1:4173';
+
+  return new Set(
+    configuredOrigins
+      .split(',')
+      .map((origin) => origin.trim().replace(/\/$/, ''))
+      .filter(Boolean)
+      .map((configuredValue) => {
+        try {
+          return new URL(configuredValue).origin;
+        } catch {
+          return configuredValue;
+        }
+      }),
+  );
+}
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.enableShutdownHooks();
-  const allowedOrigins = (
-    process.env.CORS_ALLOWED_ORIGINS ??
-    'http://localhost:5173,http://127.0.0.1:5173,http://localhost:4173,http://127.0.0.1:4173'
-  )
-    .split(',')
-    .map((origin) => origin.trim())
-    .filter(Boolean);
+  const allowedOrigins = parseAllowedCorsOrigins();
 
   app.enableCors({
     origin: (origin: string | undefined, callback: (error: Error | null, allow?: boolean) => void) => {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || allowedOrigins.has(origin)) {
         callback(null, true);
         return;
       }

@@ -220,7 +220,7 @@ export class AuthService {
     }
 
     const allowedOrigins = this.getAllowedAdminOrigins();
-    if (!allowedOrigins.includes(parsed.origin)) {
+    if (!allowedOrigins.has(parsed.origin)) {
       return this.getDefaultReturnTo();
     }
 
@@ -228,10 +228,10 @@ export class AuthService {
   }
 
   private getDefaultReturnTo() {
-    return this.getAllowedAdminOrigins()[0] ?? 'http://localhost:5173/';
+    return this.getAllowedAdminUrls()[0] ?? 'http://localhost:5173/';
   }
 
-  private getAllowedAdminOrigins() {
+  private getAllowedAdminUrls() {
     const configuredOrigins =
       process.env.ADMIN_APP_URLS ??
       'http://localhost:5173,http://127.0.0.1:5173,http://localhost:4173,http://127.0.0.1:4173';
@@ -240,6 +240,20 @@ export class AuthService {
       .split(',')
       .map((origin) => origin.trim().replace(/\/$/, ''))
       .filter(Boolean);
+  }
+
+  private getAllowedAdminOrigins() {
+    return new Set(
+      this.getAllowedAdminUrls()
+        .map((configuredUrl) => {
+          try {
+            return new URL(configuredUrl).origin;
+          } catch {
+            return configuredUrl;
+          }
+        })
+        .filter(Boolean),
+    );
   }
 
   private getGithubCallbackUrl() {

@@ -41,9 +41,19 @@ Create a Railway PostgreSQL service in the same project and set these environmen
 Recommended production values:
 
 - `API_PUBLIC_URL=https://<your-backend-domain>`
-- `ADMIN_APP_URLS=https://<your-admin-domain>`
-- `CORS_ALLOWED_ORIGINS=https://<your-admin-domain>`
+- `ADMIN_APP_URLS=https://tylordev.github.io/Tylordev-Admin`
+- `CORS_ALLOWED_ORIGINS=https://tylordev.github.io`
 - `GITHUB_CALLBACK_URL=https://<your-backend-domain>/auth/github/callback`
+
+For this project specifically:
+
+- Public portfolio: `https://tylordev.github.io/Tylordev`
+- Admin panel: `https://tylordev.github.io/Tylordev-Admin`
+
+Important:
+
+- `ADMIN_APP_URLS` can include full URLs with paths, and the backend will validate them by origin.
+- `CORS_ALLOWED_ORIGINS` should use the browser origin, which for both GitHub Pages sites is just `https://tylordev.github.io`.
 
 Notes:
 
