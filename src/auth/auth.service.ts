@@ -339,7 +339,8 @@ export class AuthService {
   }
 
   private serializeCookie(name: string, value: string, options: CookieOptions = {}) {
-    const parts = [`${name}=${encodeURIComponent(value)}`, 'Path=/', 'SameSite=Lax'];
+    const sameSite = this.shouldUseSecureCookies() ? 'None' : 'Lax';
+    const parts = [`${name}=${encodeURIComponent(value)}`, 'Path=/', `SameSite=${sameSite}`];
 
     if (options.maxAgeMs !== undefined) {
       const maxAgeSeconds = Math.max(0, Math.floor(options.maxAgeMs / 1000));
