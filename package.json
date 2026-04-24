@@ -4,12 +4,14 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
+    "postinstall": "prisma generate",
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/src/main.js",
     "start:dev": "ts-node-dev --respawn --transpile-only src/main.ts",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:push": "prisma db push",
+    "railway:predeploy": "prisma db push",
     "seed": "ts-node --transpile-only prisma/seed.ts",
     "db:start": "pg_ctl -D .postgres/data -l .postgres/postgres.log start",
     "db:stop": "pg_ctl -D .postgres/data stop"

@@ -6,7 +6,9 @@ import {
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
+import { SessionAuthGuard } from '../auth/session-auth.guard';
 import { CreateProjectDto, UpdateProjectDto } from '../shared/dtos';
 import { ProjectsService } from './projects.service';
 
@@ -25,16 +27,19 @@ export class ProjectsController {
   }
 
   @Post()
+  @UseGuards(SessionAuthGuard)
   create(@Body() dto: CreateProjectDto) {
     return this.projectsService.create(dto);
   }
 
   @Put(':slug')
+  @UseGuards(SessionAuthGuard)
   update(@Param('slug') slug: string, @Body() dto: UpdateProjectDto) {
     return this.projectsService.update(slug, dto);
   }
 
   @Delete(':slug')
+  @UseGuards(SessionAuthGuard)
   remove(@Param('slug') slug: string) {
     return this.projectsService.remove(slug);
   }
