@@ -5,10 +5,12 @@ import { getProjectHeaderMessage } from '../src/shared/project-header-message';
 
 const prisma = new PrismaClient();
 const locales = ['en-us', 'es-mx', 'pt-br'] as const;
+const apiRoot =
+  process.env.SEED_API_DIR ?? path.resolve(__dirname, '..', '..', 'original', 'src', 'API');
 const projectDirectoryByLocale = (locale: string) =>
-  path.resolve(__dirname, '..', '..', 'src', 'API', locale, 'Projects');
+  path.resolve(apiRoot, locale, 'Projects');
 const articleDirectoryByLocale = (locale: string) =>
-  path.resolve(__dirname, '..', '..', 'src', 'API', locale, 'Articles');
+  path.resolve(apiRoot, locale, 'Articles');
 
 function readJson<T>(filePath: string): T {
   return JSON.parse(fs.readFileSync(filePath, 'utf-8')) as T;
