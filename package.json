@@ -8,6 +8,7 @@
     "build": "tsc -p tsconfig.build.json",
     "start": "node dist/src/main.js",
     "start:dev": "ts-node-dev --respawn --transpile-only src/main.ts",
+    "local:dev": "cross-env PATH=\"%USERPROFILE%\\scoop\\apps\\postgresql\\current\\bin;%USERPROFILE%\\scoop\\shims;%PATH%\" concurrently --kill-others \"postgres -D .\\.postgres\\data -p 5433\" \"npm run start:dev\"",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:push": "prisma db push",
@@ -29,6 +30,8 @@
   },
   "devDependencies": {
     "@types/node": "^22.10.2",
+    "concurrently": "^9.2.1",
+    "cross-env": "^10.1.0",
     "prisma": "^6.7.0",
     "ts-node": "^10.9.2",
     "ts-node-dev": "^2.0.0",

@@ -3,8 +3,7 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProjectDto, UpdateProjectDto } from '../shared/dtos';
 import { SUPPORTED_LOCALES, SupportedLocale } from '../shared/locales';
-import { getProjectHeaderMessage } from '../shared/project-header-message';
-import { createBaseSlug, createSlugSuffix, getPrimaryTitle } from '../shared/slug.utils';
+import { createBaseSlug, createSlugSuffix } from '../shared/slug.utils';
 
 const projectInclude = {
   translations: true,
@@ -50,9 +49,9 @@ export class ProjectsService {
   }
 
   async create(dto: CreateProjectDto) {
-    const resolvedSlug = await this.createUniqueSlug(getPrimaryTitle(dto.translations));
+    const resolvedSlug = await this.createUniqueSlug(dto.title ?? 'project');
     const project = await this.prisma.project.create({
-      data: this.toCreateInput(this.withAutomaticHeaderMessage(dto), resolvedSlug),
+      data: this.toCreateInput(dto, resolvedSlug),
       include: projectInclude,
     });
 
@@ -61,46 +60,52 @@ export class ProjectsService {
 
   async update(slug: string, dto: UpdateProjectDto) {
     await this.ensureExists(slug);
-    const normalizedDto = this.withAutomaticHeaderMessage(dto);
-    const resolvedSlug = await this.createUniqueSlug(getPrimaryTitle(dto.translations), slug);
+    const resolvedSlug = await this.createUniqueSlug(dto.title ?? 'project', slug);
 
     const project = await this.prisma.project.update({
       where: { slug },
       data: {
         slug: resolvedSlug,
-        publishedAt: normalizedDto.publishedAt ? new Date(normalizedDto.publishedAt) : null,
-        coverImageSrc: normalizedDto.coverImageSrc,
-        coverImageAlt: normalizedDto.coverImageAlt,
-        backgroundImage: normalizedDto.backgroundImage,
-        backgroundAlt: normalizedDto.backgroundAlt,
+        publishedAt: dto.publishedAt ? new Date(dto.publishedAt) : null,
+        coverImageSrc: dto.coverImageSrc,
+        status: dto.status ?? '',
+        type: dto.type ?? '',
+        technologies: dto.technologies ?? '',
+        title: dto.title ?? '',
         translations: {
           deleteMany: {},
-          create: normalizedDto.translations,
+          create: dto.translations.map((t) => ({
+            locale: t.locale,
+            subtitle: t.subtitle ?? '',
+          })),
         },
         buttons: {
           deleteMany: {},
-          create: normalizedDto.buttons.map((button, index) => ({
+          create: (dto.buttons ?? []).map((button, index) => ({
             order: index,
-            icon: button.icon,
-            url: button.url,
+            icon: button.icon ?? '',
+            url: button.url ?? '',
             translations: {
-              create: button.translations,
+              create: (button.translations ?? []).map((t) => ({
+                locale: t.locale,
+                text: t.text ?? '',
+              })),
             },
           })),
         },
         sections: {
           deleteMany: {},
-          create: normalizedDto.sections.map((section, index) => ({
+          create: (dto.sections ?? []).map((section, index) => ({
             order: index,
-            flexDirection: section.flexDirection,
-            coverImage: section.coverImage,
+            flexDirection: section.flexDirection ?? 'row',
+            coverImage: section.coverImage ?? '',
             translations: {
-              create: section.translations.map((translation) => ({
+              create: (section.translations ?? []).map((translation) => ({
                 locale: translation.locale,
-                summary: translation.summary,
-                readMore: translation.readMore,
-                modalContent: translation.modalContent,
-                close: translation.close,
+                summary: translation.summary ?? '',
+                readMore: translation.readMore ?? '',
+                modalContent: translation.modalContent ?? '',
+                close: translation.close ?? '',
               })),
             },
           })),
@@ -134,34 +139,42 @@ export class ProjectsService {
       slug,
       publishedAt: dto.publishedAt ? new Date(dto.publishedAt) : null,
       coverImageSrc: dto.coverImageSrc,
-      coverImageAlt: dto.coverImageAlt,
-      backgroundImage: dto.backgroundImage,
-      backgroundAlt: dto.backgroundAlt,
+      backgroundImage: dto.backgroundImage ?? '',
+      status: dto.status ?? '',
+      type: dto.type ?? '',
+      technologies: dto.technologies ?? '',
+      title: dto.title ?? '',
       translations: {
-        create: dto.translations,
+        create: dto.translations.map((t) => ({
+          locale: t.locale,
+          subtitle: t.subtitle ?? '',
+        })),
       },
       buttons: {
-        create: dto.buttons.map((button, index) => ({
+        create: (dto.buttons ?? []).map((button, index) => ({
           order: index,
-          icon: button.icon,
-          url: button.url,
+          icon: button.icon ?? '',
+          url: button.url ?? '',
           translations: {
-            create: button.translations,
+            create: (button.translations ?? []).map((t) => ({
+              locale: t.locale,
+              text: t.text ?? '',
+            })),
           },
         })),
       },
       sections: {
-        create: dto.sections.map((section, index) => ({
+        create: (dto.sections ?? []).map((section, index) => ({
           order: index,
-          flexDirection: section.flexDirection,
-          coverImage: section.coverImage,
+          flexDirection: section.flexDirection ?? 'row',
+          coverImage: section.coverImage ?? '',
           translations: {
-            create: section.translations.map((translation) => ({
+            create: (section.translations ?? []).map((translation) => ({
               locale: translation.locale,
-              summary: translation.summary,
-              readMore: translation.readMore,
-              modalContent: translation.modalContent,
-              close: translation.close,
+              summary: translation.summary ?? '',
+              readMore: translation.readMore ?? '',
+              modalContent: translation.modalContent ?? '',
+              close: translation.close ?? '',
             })),
           },
         })),
@@ -169,15 +182,7 @@ export class ProjectsService {
     };
   }
 
-  private withAutomaticHeaderMessage<T extends CreateProjectDto | UpdateProjectDto>(dto: T): T {
-    return {
-      ...dto,
-      translations: dto.translations.map((translation) => ({
-        ...translation,
-        message: getProjectHeaderMessage(translation.locale as SupportedLocale),
-      })),
-    };
-  }
+
 
   private toResponse(project: Prisma.ProjectGetPayload<{ include: typeof projectInclude }>) {
     const translationsByLocale = Object.fromEntries(
@@ -191,10 +196,12 @@ export class ProjectsService {
       updatedAt: project.updatedAt,
       publishedAt: project.publishedAt,
       shared: {
+        title: project.title,
         coverImageSrc: project.coverImageSrc,
-        coverImageAlt: project.coverImageAlt,
         backgroundImage: project.backgroundImage,
-        backgroundAlt: project.backgroundAlt,
+        status: project.status,
+        type: project.type,
+        technologies: project.technologies,
         buttons: project.buttons
           .sort((a, b) => a.order - b.order)
           .map((button) => {
@@ -216,11 +223,6 @@ export class ProjectsService {
         const translation = translationsByLocale[locale];
         return {
           locale,
-          title: translation?.title ?? '',
-          status: translation?.status ?? '',
-          type: translation?.type ?? '',
-          tags: translation?.tags ?? '',
-          message: translation?.message ?? '',
           subtitle: translation?.subtitle ?? '',
         };
       }),

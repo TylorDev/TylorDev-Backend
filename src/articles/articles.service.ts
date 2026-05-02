@@ -63,23 +63,29 @@ export class ArticlesService {
         slug: resolvedSlug,
         publishedAt: dto.publishedAt ? new Date(dto.publishedAt) : null,
         coverImageSrc: dto.coverImageSrc,
-        bannerImage: dto.bannerImage,
-        researchStyleBorderTop: dto.researchStyle.borderTop,
-        researchStyleBorderBottom: dto.researchStyle.borderBottom,
+        bannerImage: dto.bannerImage ?? '',
+        researchStyleBorderTop: dto.researchStyle?.borderTop ?? '',
+        researchStyleBorderBottom: dto.researchStyle?.borderBottom ?? '',
         translations: {
           deleteMany: {},
-          create: dto.translations,
+          create: dto.translations.map((t) => ({
+            locale: t.locale,
+            title: t.title,
+            category: t.category ?? '',
+            content: t.content ?? '',
+            contentTitle: t.contentTitle ?? '',
+          })),
         },
         sections: {
           deleteMany: {},
-          create: dto.sections.map((section, index) => ({
+          create: (dto.sections ?? []).map((section, index) => ({
             order: index,
             image: section.image ?? null,
             translations: {
-              create: section.translations.map((translation) => ({
+              create: (section.translations ?? []).map((translation) => ({
                 locale: translation.locale,
-                title: translation.title,
-                paragraph: translation.paragraph,
+                title: translation.title ?? '',
+                paragraph: translation.paragraph ?? '',
               })),
             },
           })),
@@ -113,21 +119,27 @@ export class ArticlesService {
       slug,
       publishedAt: dto.publishedAt ? new Date(dto.publishedAt) : null,
       coverImageSrc: dto.coverImageSrc,
-      bannerImage: dto.bannerImage,
-      researchStyleBorderTop: dto.researchStyle.borderTop,
-      researchStyleBorderBottom: dto.researchStyle.borderBottom,
+      bannerImage: dto.bannerImage ?? '',
+      researchStyleBorderTop: dto.researchStyle?.borderTop ?? '',
+      researchStyleBorderBottom: dto.researchStyle?.borderBottom ?? '',
       translations: {
-        create: dto.translations,
+        create: dto.translations.map((t) => ({
+          locale: t.locale,
+          title: t.title,
+          category: t.category ?? '',
+          content: t.content ?? '',
+          contentTitle: t.contentTitle ?? '',
+        })),
       },
       sections: {
-        create: dto.sections.map((section, index) => ({
+        create: (dto.sections ?? []).map((section, index) => ({
           order: index,
           image: section.image ?? null,
           translations: {
-            create: section.translations.map((translation) => ({
+            create: (section.translations ?? []).map((translation) => ({
               locale: translation.locale,
-              title: translation.title,
-              paragraph: translation.paragraph,
+              title: translation.title ?? '',
+              paragraph: translation.paragraph ?? '',
             })),
           },
         })),

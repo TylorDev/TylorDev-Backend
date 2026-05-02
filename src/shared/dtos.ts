@@ -5,7 +5,6 @@ import {
   IsIn,
   IsOptional,
   IsString,
-  IsUrl,
   ValidateNested,
 } from 'class-validator';
 import { Type } from 'class-transformer';
@@ -17,182 +16,203 @@ export class TranslationDto {
 }
 
 export class ProjectTranslationDto extends TranslationDto {
+  @IsOptional()
   @IsString()
-  title!: string;
+  subtitle?: string;
+}
 
-  @IsString()
-  status!: string;
 
-  @IsString()
-  type!: string;
 
+export class ProjectButtonDto {
+  @IsOptional()
   @IsString()
-  tags!: string;
+  icon?: string;
 
   @IsOptional()
   @IsString()
-  message!: string;
+  url?: string;
 
-  @IsString()
-  subtitle!: string;
-}
-
-export class ProjectButtonDto {
-  @IsBoolean()
-  icon!: boolean;
-
-  @IsUrl()
-  url!: string;
-
+  @IsOptional()
   @IsArray()
-  @ArrayMinSize(3)
   @ValidateNested({ each: true })
   @Type(() => ProjectButtonTranslationDto)
-  translations!: ProjectButtonTranslationDto[];
+  translations?: ProjectButtonTranslationDto[];
 }
 
 export class ProjectButtonTranslationDto extends TranslationDto {
+  @IsOptional()
   @IsString()
-  text!: string;
+  text?: string;
 }
 
 export class ProjectSectionTranslationDto extends TranslationDto {
+  @IsOptional()
   @IsString()
-  summary!: string;
+  summary?: string;
 
+  @IsOptional()
   @IsString()
-  readMore!: string;
+  readMore?: string;
 
+  @IsOptional()
   @IsString()
-  modalContent!: string;
+  modalContent?: string;
 
+  @IsOptional()
   @IsString()
-  close!: string;
+  close?: string;
 }
 
 export class ProjectSectionDto {
+  @IsOptional()
   @IsString()
-  flexDirection!: string;
+  flexDirection?: string;
 
-  @IsUrl()
-  coverImage!: string;
+  @IsOptional()
+  @IsString()
+  coverImage?: string;
 
+  @IsOptional()
   @IsArray()
-  @ArrayMinSize(3)
   @ValidateNested({ each: true })
   @Type(() => ProjectSectionTranslationDto)
-  translations!: ProjectSectionTranslationDto[];
+  translations?: ProjectSectionTranslationDto[];
 }
 
 export class CreateProjectDto {
+  @IsOptional()
   @IsString()
-  slug!: string;
+  slug?: string;
 
   @IsOptional()
   @IsString()
   publishedAt?: string;
 
-  @IsUrl()
+  @IsString()
   coverImageSrc!: string;
 
+  @IsOptional()
   @IsString()
-  coverImageAlt!: string;
+  backgroundImage?: string;
 
-  @IsUrl()
-  backgroundImage!: string;
-
+  @IsOptional()
   @IsString()
-  backgroundAlt!: string;
+  status?: string;
+
+  @IsOptional()
+  @IsString()
+  type?: string;
+
+  @IsOptional()
+  @IsString()
+  technologies?: string;
+
+  @IsOptional()
+  @IsString()
+  title?: string;
 
   @IsArray()
-  @ArrayMinSize(3)
+  @ArrayMinSize(1)
   @ValidateNested({ each: true })
   @Type(() => ProjectTranslationDto)
   translations!: ProjectTranslationDto[];
 
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ProjectButtonDto)
-  buttons!: ProjectButtonDto[];
+  buttons?: ProjectButtonDto[];
 
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ProjectSectionDto)
-  sections!: ProjectSectionDto[];
+  sections?: ProjectSectionDto[];
 }
 
 export class UpdateProjectDto extends CreateProjectDto {}
 
 export class ArticleTranslationDto extends TranslationDto {
+  @IsOptional()
   @IsString()
-  category!: string;
+  category?: string;
 
   @IsString()
   title!: string;
 
+  @IsOptional()
   @IsString()
-  content!: string;
+  content?: string;
 
+  @IsOptional()
   @IsString()
-  contentTitle!: string;
+  contentTitle?: string;
 }
 
 export class ArticleSectionTranslationDto extends TranslationDto {
+  @IsOptional()
   @IsString()
-  title!: string;
+  title?: string;
 
+  @IsOptional()
   @IsString()
-  paragraph!: string;
+  paragraph?: string;
 }
 
 export class ArticleSectionDto {
   @IsOptional()
-  @IsUrl()
+  @IsString()
   image?: string;
 
+  @IsOptional()
   @IsArray()
-  @ArrayMinSize(3)
   @ValidateNested({ each: true })
   @Type(() => ArticleSectionTranslationDto)
-  translations!: ArticleSectionTranslationDto[];
+  translations?: ArticleSectionTranslationDto[];
 }
 
 export class ResearchStyleDto {
+  @IsOptional()
   @IsString()
-  borderTop!: string;
+  borderTop?: string;
 
+  @IsOptional()
   @IsString()
-  borderBottom!: string;
+  borderBottom?: string;
 }
 
 export class CreateArticleDto {
+  @IsOptional()
   @IsString()
-  slug!: string;
+  slug?: string;
 
   @IsOptional()
   @IsString()
   publishedAt?: string;
 
-  @IsUrl()
+  @IsString()
   coverImageSrc!: string;
 
-  @IsUrl()
-  bannerImage!: string;
+  @IsOptional()
+  @IsString()
+  bannerImage?: string;
 
   @IsArray()
-  @ArrayMinSize(3)
+  @ArrayMinSize(1)
   @ValidateNested({ each: true })
   @Type(() => ArticleTranslationDto)
   translations!: ArticleTranslationDto[];
 
+  @IsOptional()
   @ValidateNested()
   @Type(() => ResearchStyleDto)
-  researchStyle!: ResearchStyleDto;
+  researchStyle?: ResearchStyleDto;
 
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ArticleSectionDto)
-  sections!: ArticleSectionDto[];
+  sections?: ArticleSectionDto[];
 }
 
 export class UpdateArticleDto extends CreateArticleDto {}
