@@ -11,8 +11,8 @@
     "local:dev": "cross-env PATH=\"%USERPROFILE%\\scoop\\apps\\postgresql\\current\\bin;%USERPROFILE%\\scoop\\shims;%PATH%\" concurrently --kill-others \"postgres -D .\\.postgres\\data -p 5433\" \"npm run start:dev\"",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:push": "prisma db push",
-    "railway:predeploy": "prisma db push --accept-data-loss",
+    "prisma:push": "prisma db push --accept-data-loss --force-reset",
+    "railway:predeploy": "prisma db push --accept-data-loss --force-reset",
     "seed": "ts-node --transpile-only prisma/seed.ts",
     "db:start": "pg_ctl -D .postgres/data -l .postgres/postgres.log start",
     "db:stop": "pg_ctl -D .postgres/data stop"
