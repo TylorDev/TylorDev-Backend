@@ -12,7 +12,7 @@
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:push": "prisma db push",
-    "railway:predeploy": "prisma db push",
+    "railway:predeploy": "prisma db push --accept-data-loss",
     "seed": "ts-node --transpile-only prisma/seed.ts",
     "db:start": "pg_ctl -D .postgres/data -l .postgres/postgres.log start",
     "db:stop": "pg_ctl -D .postgres/data stop"
