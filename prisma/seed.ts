@@ -1,7 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import * as fs from 'fs';
 import * as path from 'path';
-import { getProjectHeaderMessage } from '../src/shared/project-header-message';
 
 const prisma = new PrismaClient();
 const locales = ['en-us', 'es-mx', 'pt-br'] as const;
@@ -23,6 +22,11 @@ function getFileNames(directory: string) {
     .sort();
 }
 
+function getTechnologies(project: any) {
+  const tags = project.data.tags;
+  return Array.isArray(tags) ? tags.join(', ') : tags ?? '';
+}
+
 async function seedProjects() {
   const slugs = getFileNames(projectDirectoryByLocale('es-mx')).map((file) =>
     file.replace('.json', ''),
@@ -40,9 +44,11 @@ async function seedProjects() {
       where: { slug },
       update: {
         coverImageSrc: projectByLocale['es-mx'].data.coverImageSrc,
-        coverImageAlt: projectByLocale['es-mx'].data.coverImageAlt,
         backgroundImage: projectByLocale['es-mx'].header.backgroundImage,
-        backgroundAlt: projectByLocale['es-mx'].header.backgroundAlt,
+        status: projectByLocale['es-mx'].data.status ?? '',
+        type: projectByLocale['es-mx'].data.type ?? '',
+        technologies: getTechnologies(projectByLocale['es-mx']),
+        title: projectByLocale['es-mx'].header.title ?? '',
         publishedAt: projectByLocale['es-mx'].data.date
           ? new Date(projectByLocale['es-mx'].data.date)
           : null,
@@ -50,11 +56,6 @@ async function seedProjects() {
           deleteMany: {},
           create: locales.map((locale) => ({
             locale,
-            title: projectByLocale[locale].header.title,
-            status: projectByLocale[locale].data.status,
-            type: projectByLocale[locale].data.type,
-            tags: projectByLocale[locale].data.tags,
-            message: getProjectHeaderMessage(locale),
             subtitle: projectByLocale[locale].header.subtitle,
           })),
         },
@@ -93,20 +94,17 @@ async function seedProjects() {
       create: {
         slug,
         coverImageSrc: projectByLocale['es-mx'].data.coverImageSrc,
-        coverImageAlt: projectByLocale['es-mx'].data.coverImageAlt,
         backgroundImage: projectByLocale['es-mx'].header.backgroundImage,
-        backgroundAlt: projectByLocale['es-mx'].header.backgroundAlt,
+        status: projectByLocale['es-mx'].data.status ?? '',
+        type: projectByLocale['es-mx'].data.type ?? '',
+        technologies: getTechnologies(projectByLocale['es-mx']),
+        title: projectByLocale['es-mx'].header.title ?? '',
         publishedAt: projectByLocale['es-mx'].data.date
           ? new Date(projectByLocale['es-mx'].data.date)
           : null,
         translations: {
           create: locales.map((locale) => ({
             locale,
-            title: projectByLocale[locale].header.title,
-            status: projectByLocale[locale].data.status,
-            type: projectByLocale[locale].data.type,
-            tags: projectByLocale[locale].data.tags,
-            message: getProjectHeaderMessage(locale),
             subtitle: projectByLocale[locale].header.subtitle,
           })),
         },
